@@ -36,7 +36,7 @@ Your machine setup includes the following items already downloaded:
 
 - Windows 10 (build 10240) or better
 
-- Visual Studio 2015 or above – [Community Edition](http://www.visualstudio.com/downloads/download-visual-studio-vs) is sufficient.
+- Visual Studio 2015 or above – [Community Edition](http://www.visualstudio.com/downloads/download-visual-studio-vs) is sufficient. Make sure to install Visual Studio Update 1 for the latest 10586 build of Windows IoT Core: https://www.visualstudio.com/en-us/news/vs2015-update1-vs.aspx
 
 	> **NOTE:** If you choose to install a different edition of VS 2015, make sure to do a **Custom** install and select the checkbox **Universal Windows App Development Tools** -> **Tools and Windows SDK**.
 
@@ -47,6 +47,12 @@ Your machine setup includes the following items already downloaded:
 
 ### Download Azure Device Explorer
 - To register your devices in the Azure IoT Hub Service and to monitor the communication between them you need to install the [Azure Device Explorer](https://github.com/Azure/azure-iot-sdks/blob/master/tools/DeviceExplorer/doc/how_to_use_device_explorer.md). Follow this link to download the SetupDeviceExplorer.msi file: https://github.com/Azure/azure-iot-sdks/releases.
+
+![Azure IoT Hub Device Explorer](Images/iot_hub_explorer.PNG?raw=true)
+
+### Download the IoT Core Dashboard
+- The Windows 10 IoT Core Dashboard allows you to easily discover and access your tiny devices running Windows IoT Core 10.0.10586 version or later. You can download this dashboard from here: https://ms-iot.github.io/content/en-US/GetStarted.htm
+
 
 <a name="Task12" />
 ### Setting up your Devices
@@ -78,34 +84,40 @@ To setup your devices perform the following steps:
 
 5. Wait for the OS to boot.
 
-6. Run the **Windows 10 IoT Core Watcher** utility (installed in step 2) in your development PC and copy your Raspberry Pi IP address by right-clicking on the detected device and selecting **Copy IP Address**.
+<Go to "blog url" and download the Windows 10 IoT Core Watcher>
+
+6. Enable your device to internet share with the Raspberry Pi by following the instructions in the file 'Setup your device to Internet Share.pdf'
+
+7. Run the **Windows 10 IoT Core Dashboard** on your development PC and note your Raspberry Pi IP address on the detected device [each device in this lab has a unqiue name, situated on the blue box].
 
 	- Click the windows "**Start**" button
-	- Type "**WindowsIoTCoreWatcher**" to pull it up in the search results
+	- Type "**IoT**" to pull it up in the search results
 	- You may want to right click on the program name and select "**Pin to Start**" to pin it to your start screen for easy access
 	- Press **Enter** to run it
 
-	![windows-iot-core-watcher](Images/windows-iot-core-watcher.png?raw=true)
+	![windows-iot-core-dashboard](Images/iot_core_dashboard.PNG?raw=true)
 
-7. Launch an administrator PowerShell console on your local PC. The easiest way to do this is to type _powershell_ in the **Search the web and Windows** textbox near the Windows Start Menu. Windows will find **PowerShell** on your machine. Right-click the **Windows PowerShell** entry and select **Run as administrator**. The PS console will show.
+<If your device does not show up, follow the "GetIPAddressFromHostName.docx" document for instructions on gaining your IP from your unique device name on the bright label>
+
+8. Launch an administrator PowerShell console on your local PC. The easiest way to do this is to type _powershell_ in the **Search the web and Windows** textbox near the Windows Start Menu. Windows will find **PowerShell** on your machine. Right-click the **Windows PowerShell** entry and select **Run as administrator**. The PS console will show.
 
 	![Running Powershell as Administrator](Images/running-powershell-as-administrator.png?raw=true)
 
-8. You may need to start the **WinRM** service on your desktop to enable remote connections. From the PS console type the following command:
+9. You may need to start the **WinRM** service on your desktop to enable remote connections. From the PS console type the following command:
 
 	`net start WinRM`
 
-9. From the PS console, type the following command, substituting '<_IP Address_>' with the IP value copied in prev:
+10. From the PS console, type the following command, substituting '<_IP Address_>' with the IP value copied in prev:
 
 	`Set-Item WSMan:\localhost\Client\TrustedHosts -Value <machine-name or IP Address>`
 
-10.  Type **Y** and press **Enter** to confirm the change.
+11.  Type **Y** and press **Enter** to confirm the change.
 
-11. Now you can start a session with you Windows IoT Core device. From you administrator PS console, type:
+12. Now you can start a session with you Windows IoT Core device. From you administrator PS console, type:
 
 	`Enter-PSSession -ComputerName <IP Address> -Credential localhost\Administrator`
 
-12. In the credential dialog enter the following default password: `p@ssw0rd`.
+13. In the credential dialog enter the following default password: `p@ssw0rd`.
 
 	> **Note:** The connection process is not immediate and can take up to 30 seconds.
 
@@ -113,7 +125,7 @@ To setup your devices perform the following steps:
 
 	![Connected to the Raspberry using PS](Images/connected-to-the-raspberry-using-ps.png?raw=true)
 
-13. Disconnect from the Powershell Session
+14. Disconnect from the Powershell Session
 	`Exit-PSSession`
 
 <a name="Task13" />
@@ -172,7 +184,7 @@ You must register your device in order to be able to send and receive informatio
 Now that the device is configured, you will see how to create an application to read the value of the FEZ HAT sensors, and then send those values to an Azure IoT Hub.
 
 <a name="Task21" />
-### Read FEZ HAT sensors
+### [OPTIONAL] Read FEZ HAT sensors
 In order to get the information out of the hat sensors, you will take advantage of the [Developers' Guide](https://www.ghielectronics.com/docs/329/fez-hat-developers-guide "GHI Electronics FEZ HAT Developer's Guide") that [GHI Electronics](https://www.ghielectronics.com/ "GHI Electronics")  published.
 
 1. Find the folder on your USB Stick called 'ghi_elect-windows-iot-183b64180b7c'and open the Microsoft Visual Studio Solution File
@@ -420,7 +432,8 @@ Now that you know how to read the FEZ HAT sensors data, you will send that infor
 	````
 
 	> Note you need to add the the **async** word (a modifier) to the event handler to properly handle an asynchronous call to the FEZ HAT initialization method. Place async as shown above between private and void
-	> WHAT DOES ASYNCHRONOUS MEAN?
+	
+	> **Asynchronous** methods/keywords help optimize the execution of resources. An asynchronous method returns an answer immediately, allowing the calling program to perform other operations at the same time. Allowing multi-threaded programming. This is different to a synchronous method that waits for the method to complete before continuing to execute the rest of the code.
 
 14. Now you are ready to run the application. Connect the Raspberry Pi with the FEZ HAT and run the application. After the app is deployed you will start to see in the output console the values polled from the sensor. The information sent to Azure is also shown in the console.
 
